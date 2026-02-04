@@ -1,0 +1,152 @@
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="pix/ico/favicon.ico">
+
+  <script src="https://aframe.io/releases/1.7.1/aframe.min.js"></script>
+  <title>Walking Project</title>
+</head>
+
+
+<body>
+  <a-scene>
+
+    <!--assets are items meant to preload-->
+    <!-- I give the asset an ID and reference it in the "material" of the "logohedron"-->
+    <a-assets>
+      <!--pix-->
+      <img id="slats" src="pics/old-metal-slats1_albedo.png">
+      <img id="slatsNorm" src="pics/old-metal-slats1_normal-ogl.png">
+      <img id="grip" src="pics/grip-rusted-steel_albedo.png">
+      <img id="gripNorm" src="pics/grip-rusted-steel_normal-ogl.png">
+      <!--sounz-->
+      <audio id="step" src="sounz/754542__geoff-bremner-audio__mechanical-clack-clink-crunchy-edit.wav"></audio>
+    </a-assets>
+
+    <!--camera and flashlight-->
+    <a-entity camera look-controls wasd-controls="acceleration: 7"
+    position="0 1.6 -4">
+  <a-entity
+    light="type: spot; castShadow: true; intensity: 6; angle: 20; penumbra: 0.6">
+  </a-entity>
+</a-entity>
+
+    <!--LIGHTS-->
+    <!--follow spot-->
+    <a-entity light="type: spot; castShadow: true;intensity: 2; angle: 20; penumbra: 0.3; target: #mover"
+      position="0 10 0">
+    </a-entity>
+
+    <!--directional-->
+    <a-entity light="type: directional; color: #8fbcd4; intensity: 0.3" position="0 5 5" rotation="0 -45 0">
+    </a-entity>
+
+    <!--body controller-->
+    <a-entity position="0 2.5 -7"
+      animation__rot="property: rotation; to: 0 360 0; loop: true; dur: 19000; easing: linear">
+
+      <!--body-->
+      <a-entity id="mover" geometry="primitive: sphere; radius: 1"
+        material="src:#slats; normalMap:#slatsNorm; normalScale: 2 2 ;repeat: 4 4" position="5 0 0" rotation="0 0 15"
+        animation__rot="property: rotation; to: 0 0 -15; loop: true; dur: 700; dir: alternate; easing: linear"
+        shadow="cast: true; receive: true">
+
+        <!--head-->
+        <a-entity geometry="primitive: sphere; radius: 0.5" position="0 1 -1" rotation="-15 60 0"
+          material="src:#grip; normalMap:#gripNorm; normalScale: 4 4 ; repeat: 2 2"
+          animation__rot="property: rotation; to: -15 -12 0; loop: true; dur: 2500; dir: alternate; easing: easeInOutElastic">
+
+          <!--left eye-->
+          <a-entity geometry="primitive: sphere; radius: 0.2" material="emissive: #00ffff; emissiveIntensity: 3"
+            position="-0.3 0 -0.3" rotation="-20 12 0"
+            light="type: spot; color: #0099ff; castShadow: true; intensity: 1; angle: 12; penumbra: 0;">
+          </a-entity>
+
+          <!--right eye-->
+          <a-entity geometry="primitive: sphere; radius: 0.2" material="emissive: #00ffff; emissiveIntensity: 1"
+            position="0.3 0 -0.3" rotation="-20 -12 0"
+            light="type: spot; color: #0099ff; castShadow: true; intensity: 1; angle: 12; penumbra: 0;">
+          </a-entity>
+
+          <!--head close tag-->
+        </a-entity>
+
+<!--shoulder girdle-->
+<a-entity
+rotation="0 -15 12"
+animation__rot="property: rotation; to: 0 -15 12 ; loop: true; dur: 2500; dir: alternate; easing: easeInOutCirc"
+>
+<!--left shoulder-->
+        <a-entity geometry="primitive: sphere; radius: 0.3"
+          material="src:#slats; normalMap:#slatsNorm; normalScale: 2 2 ; repeat: 1 1" position="-0.5 0.75 0"
+          rotation="12 0 -30"
+          animation__rot="property: rotation; to: 70 0 -30 ; loop: true; dur: 700; dir: alternate; easing: linear">
+          <!--cylinder-->
+          <a-entity geometry="primitive: cylinder; radius: 0.25; height: 1.5"
+            material="src:#grip; normalMap:#gripNorm; normalScale: 4 4 ; repeat: 4 3" position="0 -0.85 0"></a-entity>
+        </a-entity>
+        <!--right shoulder-->
+        <a-entity geometry="primitive: sphere; radius: 0.3"
+          material="src:#slats; normalMap:#slatsNorm; normalScale: 2 2 ; repeat: 1 1" position="0.5 0.75 0"
+          rotation="70 0 30"
+          animation__rot="property: rotation; to: 12 0 30 ; loop: true; dur: 700; dir: alternate; easing: linear">
+          <!--cylinder-->
+          <a-entity geometry="primitive: cylinder; radius: 0.25; height: 1.5"
+            material="src:#grip; normalMap:#gripNorm; normalScale: 4 4 ; repeat: 4 3" position="0 -0.85 0"></a-entity>
+        </a-entity>
+</a-entity>
+
+        <!--left hip-->
+        <a-entity geometry="primitive: sphere; radius: 0.3"
+          material="src:#slats; normalMap:#slatsNorm; normalScale: 2 2 ; repeat: 1 1" position="-0.5 -1 0"
+          rotation="45 0 -7"
+          animation__rot="property: rotation; to: -45 0 -7 ; loop: true; dur: 700; dir: alternate; easing: linear">
+          <!--cylinder-->
+          <a-entity geometry="primitive: cylinder; radius: 0.25; height: 1.5"
+            material="src:#grip; normalMap:#gripNorm; normalScale: 4 4 ; repeat: 4 3" position="0 -0.85 0"></a-entity>
+        </a-entity>
+        <!-- right hip-->
+        <a-entity geometry="primitive: sphere; radius: 0.3"
+          material="src:#slats; normalMap:#slatsNorm; normalScale: 2 2 ; repeat: 1 1" position="0.5 -1 0"
+          rotation="-45 0 7"
+          animation__rot="property: rotation; to: 45 0 7; loop: true; dur: 700; dir: alternate; easing: linear">
+
+          <!--left leg-->
+          <a-entity geometry="primitive: cylinder; radius: 0.25; height: 1.5"
+            material="src:#grip; normalMap:#gripNorm; normalScale: 4 4 ; repeat: 4 3" position="0 -0.85 0"></a-entity>
+
+        </a-entity>
+
+        <!--body close tag-->
+      </a-entity>
+      <!--body controller close tag-->
+    </a-entity>
+
+    <!--objects-->
+
+    <!--redish cone-->
+    <a-entity geometry="primitive: cone; height: 3; radiusBottom: 1; radiusTop: 0.3" material="color: #d35400"
+      position="0 1.5 -9" shadow="cast: true; receive: true"></a-entity>
+    <!--bluish cone-->
+    <a-entity geometry="primitive: cone; height: 3; radiusBottom: 1; radiusTop: 0.3" material="color: #00afbb"
+      position="-7 1.5 -3" shadow="cast: true; receive: true"></a-entity>
+
+    <!--yellowish cone-->
+
+    <a-entity geometry="primitive: cone; height: 3; radiusBottom: 1; radiusTop: 0.3" material="color: #bbaf55"
+      position="-4 1.5 -15" shadow="cast: true; receive: true"></a-entity>
+
+    <!--plane-->
+    <a-entity id="ground" geometry="primitive: plane; width: 24; height: 24" material="color: #7BC8A4"
+      position="0 0 -12v " rotation="-90 0 0" shadow="receive: true"></a-entity>
+
+    <!--sky-->
+    <!--notice that the "sky" here is not in the <a-entity> format-->
+    <!--"sky" is not meant as a geometry in the scene but a background-->
+    <a-sky color="#003"></a-sky>
+
+  </a-scene>
+</body>
+
+</html>
