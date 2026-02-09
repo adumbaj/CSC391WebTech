@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>A-Frame Bowling Strike Loop (Fixed)</title>
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  </head>
+
+  <body>
+    <a-scene background="color: #000000">
+      <!-- Assets: preload the audio -->
+      <a-assets>
+        <audio id="strikeAudio" src="sound/strike.mp3" preload="auto" crossorigin="anonymous"></audio>
+        <!-- Add your background image here. Place image in pics/ folder and update the src -->
+        <img id="wallImage" src="pics/bowlingball.jpg" />
+      </a-assets>
+
+      <!-- Camera -->
+      <a-entity position="0 1.5 6" rotation="0 0 0">
+        <a-camera></a-camera>
+      </a-entity>
+
+      <!-- Lights -->
+      <a-entity light="type: directional; intensity: 1" position="2 4 4"></a-entity>
+      <a-entity light="type: ambient; intensity: 0.8"></a-entity>
+      <a-entity light="type: point; intensity: 1.2; distance: 15" position="0 2 -2"></a-entity>
+
+      <!-- Lane -->
+      <a-box position="0 0 -2" width="2.5" height="0.1" depth="14" color="#c99b64"></a-box>
+      <!-- Gutters -->
+      <a-box position="-1.5 0.05 -2" width="0.5" height="0.2" depth="14" color="#555"></a-box>
+      <a-box position=" 1.5 0.05 -2" width="0.5" height="0.2" depth="14" color="#555"></a-box>
+      <!-- Back wall -->
+      <a-box position="0 1 -9" width="4" height="2" depth="0.2" material="src: #wallImage" color="#333"></a-box>
+
+      <!-- Pins -->
+      <a-entity id="pins">
+        <a-cylinder id="pin1" position="-0.45 0.75 -8"  radius="0.08" height="0.9" color="#fff"></a-cylinder>
+        <a-cylinder id="pin2" position="-0.15 0.75 -8"  radius="0.08" height="0.9" color="#fff"></a-cylinder>
+        <a-cylinder id="pin3" position=" 0.15 0.75 -8"  radius="0.08" height="0.9" color="#fff"></a-cylinder>
+        <a-cylinder id="pin4" position=" 0.45 0.75 -8"  radius="0.08" height="0.9" color="#fff"></a-cylinder>
+
+        <a-cylinder id="pin5" position="-0.30 0.75 -7.7" radius="0.08" height="0.9" color="#fff"></a-cylinder>
+        <a-cylinder id="pin6" position=" 0.00 0.75 -7.7" radius="0.08" height="0.9" color="#fff"></a-cylinder>
+        <a-cylinder id="pin7" position=" 0.30 0.75 -7.7" radius="0.08" height="0.9" color="#fff"></a-cylinder>
+
+        <a-cylinder id="pin8" position="-0.15 0.75 -7.4" radius="0.08" height="0.9" color="#fff"></a-cylinder>
+        <a-cylinder id="pin9" position=" 0.15 0.75 -7.4" radius="0.08" height="0.9" color="#fff"></a-cylinder>
+
+        <a-cylinder id="pin10" position="0 0.75 -7.1" radius="0.08" height="0.9" color="#fff"></a-cylinder>
+      </a-entity>
+
+      <!-- Bowling Ball -->
+      <a-sphere
+        id="ball"
+        position="0 0.25 3"
+        radius="0.25"
+        color="#2222ff">
+      </a-sphere>
+
+      <!-- Optional Strike Sound -->
+      <!-- (audio now in assets above) -->
+    
+    </a-scene>
+
+    <script>
+      const ball = document.getElementById('ball');
+      const strikeAudio = document.getElementById('strikeAudio');
+
+      const pins = [
+        'pin1','pin2','pin3','pin4',
+        'pin5','pin6','pin7',
+        'pin8','pin9',
+        'pin10'
+      ].map(id => document.getElementById(id));
+
+      // We'll fill this AFTER the scene loads, using getAttribute('position')
+      let originalPinPositions = [];
+
+      function playStrikeSound() {
+        if (strikeAudio) {
+          strikeAudio.currentTime = 0;
+          strikeAudio.play().catch(err => {
+            console.error('Could not play strike sound:', err);
+          });
+        }
+      }
+
+      function animateBall() {
+        ball.setAttribute('animation__roll', {
+          property: 'position',
+          from: '0 0.25 3',
+          to: '0 0.25 -7.3',
+          dur: 2000,
+          easing: 'easeInQuad',
+          loop: false
+        });
+
+        ball.setAttribute('animation__spin', {
+          property: 'rotation',
+          from: '0 0 0',
+          to: '360 0 0',
+          dur: 2000,
+          easing: 'linear',
+          loop: false
+        });
+      }
+
+      function knockPins() {
+        pins.forEach((pin) => {
+          const delay = 200 + Math.random() * 150;
+
+          // Use current attribute-based position as baseline
+          const pos = pin.getAttribute('position');
+
+          pin.setAttribute('animation__fall', {
+            property: 'rotation',
+            to: `${60 + Math.random()*40} ${-40 + Math.random()*80} 0`,
+            dur: 500,
+            delay: delay,
+            easing: 'easeOutQuad'
+          });
+
+          pin.setAttribute('animation__slide', {
+            property: 'position',
+            to: `${pos.x + (Math.random()*0.5 - 0.25)} 0.3 ${pos.z - 0.4}`,
+            dur: 500,
+            delay: delay,
+            easing: 'easeOutQuad'
+          });
+        });
+
+        playStrikeSound();
+      }
+
+      function resetScene() {
+        // Reset ball
+        ball.setAttribute('position', '0 0.25 3');
+        ball.setAttribute('rotation', '0 0 0');
+        ball.removeAttribute('animation__roll');
+        ball.removeAttribute('animation__spin');
+
+        // Reset pins to their original stored positions/rotations
+        pins.forEach((pin, i) => {
+          const orig = originalPinPositions[i];
+          pin.setAttribute('position', `${orig.x} ${orig.y} ${orig.z}`);
+          pin.setAttribute('rotation', '0 0 0');
+          pin.removeAttribute('animation__fall');
+          pin.removeAttribute('animation__slide');
+        });
+
+        // Start again after a short pause
+        setTimeout(startSequence, 500);
+      }
+
+      function startSequence() {
+        animateBall();
+        setTimeout(knockPins, 2000);  // Ball reaches pins
+        setTimeout(resetScene, 3500); // Reset after pins fall
+      }
+
+      // Wait for scene to load, THEN record original pin positions and start loop
+      document.querySelector('a-scene').addEventListener('loaded', () => {
+        originalPinPositions = pins.map(pin => {
+          const pos = pin.getAttribute('position'); // {x, y, z}
+          return { x: pos.x, y: pos.y, z: pos.z };
+        });
+
+        startSequence();
+      });
+    </script>
+  </body>
+</html>
