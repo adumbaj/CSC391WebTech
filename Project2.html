@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.11.11/lib/p5.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.11.11/lib/addons/p5.sound.min.js"></script>
+    
+    
+    
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta charset="utf-8" />
+
+    <style>
+html, body {
+  margin: 0;
+  padding: 0;
+}
+canvas {
+  display: block;
+}
+   
+    </style>
+    
+    <script>
+        let bars = [];
+let freqs = [261.63, 293.66, 329.63, 349.23, 392.00, 440.00]; // C D E F G A
+let osc;
+let started = false;
+
+let malletX = 200;
+let malletY = 80;
+let targetX = 200;
+let targetY = 80;
+
+function setup() {
+  createCanvas(500, 400);
+
+  let barWidth = 60;
+  let startX = 70;
+
+  for (let i = 0; i < 6; i++) {
+    bars.push({
+      x: startX + i * 60,
+      y: 150,
+      w: barWidth,
+      h: 180 - i * 15,
+      baseColor: color(150 + i * 15, 100 + i * 20, 220 - i * 20),
+      active: false,
+      timer: 0
+    });
+  }
+
+  osc = new p5.Oscillator('triangle');
+  osc.start();
+  osc.amp(0);
+}
+
+function draw() {
+  background(240);
+
+  drawStand();
+  drawBars();
+  moveMallet();
+  drawMallet();
+
+  fill(0);
+  noStroke();
+  textAlign(CENTER);
+  textSize(16);
+  if (!started) {
+    text("Click to enable sound, then click bars or press 1-6", width / 2, 30);
+  } else {
+    text("Xylophone Scene", width / 2, 30);
+  }
+}
+
+function drawStand() {
+  stroke(80);
+  strokeWeight(4);
+  line(50, 340, 450, 340);
+  line(70, 120, 50, 340);
+  line(430, 120, 450, 340);
+}
+
+function drawBars() {
+  for (let i = 0; i < bars.length; i++) {
+    let b = bars[i];
+
+    if (b.timer > 0) {
+      b.timer--;
+      fill(255, 220, 120);
+    } else {
+      fill(b.baseColor);
+      b.active = false;
+    }
+
+    stroke(50);
+    strokeWeight(2);
+    rect(b.x, b.y, b.w, b.h, 8);
+
+    fill(40);
+    noStroke();
+    textAlign(CENTER);
+    textSize(14);
+    text(i + 1, b.x + b.w / 2, b.y + b.h + 20);
+  }
+}
+
+function drawMallet() {
+  stroke(60);
+  strokeWeight(6);
+  line(malletX, malletY, malletX - 25, malletY - 50);
+
+  noStroke();
+  fill(90, 70, 40);
+  circle(malletX, malletY, 24);
+}
+
+function moveMallet() {
+  malletX = lerp(malletX, targetX, 0.15);
+  malletY = lerp(malletY, targetY, 0.15);
+}
+
+function mousePressed() {
+  userStartAudio();
+  started = true;
+
+  for (let i = 0; i < bars.length; i++) {
+    let b = bars[i];
+    if (
+      mouseX > b.x &&
+      mouseX < b.x + b.w &&
+      mouseY > b.y &&
+      mouseY < b.y + b.h
+    ) {
+      playBar(i);
+    }
+  }
+}
+
+function keyPressed() {
+  if (key >= '1' && key <= '6') {
+    let index = int(key) - 1;
+    playBar(index);
+  }
+}
+
+function playBar(index) {
+  let b = bars[index];
+  b.active = true;
+  b.timer = 10;
+
+  targetX = b.x + b.w / 2;
+  targetY = b.y - 10;
+
+  if (started) {
+    osc.freq(freqs[index]);
+    osc.amp(0.3, 0.01);
+    osc.amp(0, 0.2);
+  }
+}
+    </script>
+
+  </head>
+  <body>
+    <main>
+      <!-- home link placed below the p5 canvas -->
+      <a href="index.html" style="display:inline-block;margin-top:10px;padding:8px 12px;background:#333;color:#fff;text-decoration:none;border-radius:4px;">&larr; Home</a>
+    </main>
+    <script src="sketch.js"></script>
+  </body>
+</html>
